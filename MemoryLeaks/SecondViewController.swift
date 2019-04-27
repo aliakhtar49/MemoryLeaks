@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 class SecondViewController: UIViewController {
     var a = 20
     var b = 30
@@ -15,14 +16,43 @@ class SecondViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
      
-        
-        
         someClosure = { [unowned self] in
-          //  guard  let `self` = self else { return 0 }
+            //guard  let `self` = self else { return 0 }
+            return self.a + self.b
+
+        }
+        someMethodThatTakeClosure(closure: someClosure!)
+        
+     
+       
+
+    }
+    func MemoryLeakUsingSingletongMethod() {
+        
+        SingletonClass.shared.someSingletonMemoryLeakMethod(self.a) { [weak self] (value) in
+            self?.execute()
+        }
+    }
+    
+    func noMemoryLeakUsingStaticMethod() {
+                StaticClass.someStaticMethod(self.a) { (value) in
+                    self.execute()
+                }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.execute()
+        }
+    }
+    func execute() {
+        print(self.a)
+    }
+    
+    func someMethod() {
+      let newSomeClosure = {
             return self.a + self.b
             
         }
-        someMethodThatTakeClosure(closure: someClosure!)
+        someMethodThatTakeClosure(closure: newSomeClosure)
     }
     
     func someMethodThatTakeClosure(closure: @escaping () -> Int) {
@@ -80,4 +110,24 @@ class User {
 
 class Todo {
    weak var associatedUser: User?
+}
+
+class SingletonClass{
+    
+    static let shared = SingletonClass()
+    var singletonProperty: ((Int) -> Void)?
+    
+    
+    init(){}
+    
+    func someSingletonMethod(_ valuePass: Int,compeltion: (Int) -> Void) {
+        compeltion(valuePass)
+    }
+    func someSingletonMemoryLeakMethod(_ valuePass: Int,compeltion: @escaping (Int) -> Void) {
+        self.singletonProperty = compeltion
+        compeltion(valuePass)
+    }
+    deinit {
+        print("ds")
+    }
 }
