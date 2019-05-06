@@ -17,7 +17,7 @@ class ThirdViewController: UIViewController {
     
         super.viewDidLoad()
     
-        someClosure = { [unowned self] in
+        someClosure = {
             return self.a + self.b
             
         }
